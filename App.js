@@ -17,6 +17,39 @@ var firebaseConfig = {
   firebase.initializeApp(firebaseConfig);
 
 export default class App extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      msg:'',
+      msglst:[]
+    };
+  }
+
+sendmsg=msg=>{
+  let msglstref=firebase.database().ref("msglst"),
+  newmsgref=msglstref.push();
+  newmsgref.set({
+    text:msg,
+    time:Date.now()
+  });
+  this.setState({
+    msg:''
+  });
+}
+
+updatelst=msglst=>{
+  this.setState({msglst});
+}
+
+componentDidMount(){
+  let self=this;
+  firebase.database().ref('msglst').on('value',res=>{
+    if(res.val()){
+      self.updatelst(Object.values(res.val()));
+    }
+  });
+}
+
   render(){
     return (
       <View style={styles.container}>
